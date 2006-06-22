@@ -1,4 +1,4 @@
-category: Text
+category: Text Libs
 requires: cygwin perl zlib
 sdesc: "Hebrew spell-checker and dictionaries"
 ldesc: "The Hspell project is a free Hebrew linguistic project.

@@ -1,0 +1,400 @@
+diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x '*.temp' -x texinfo.tex -x ylwrap -x configure -x gnome-doc-utils.make -x intltool.m4 -x omf.make -x xmldocs.make origsrc/hspell-1.0/Makefile.in src/hspell-1.0/Makefile.in
+--- origsrc/hspell-1.0/Makefile.in	2006-04-18 07:48:39.000000000 -0500
++++ src/hspell-1.0/Makefile.in	2006-06-22 00:16:10.532250000 -0500
+@@ -37,17 +37,31 @@
+ 
+ DICTBASE = @DICTBASE@
+ 
+-PERL=@PERL@
++srcdir = @srcdir@
++
++PERL=@PERL@ -I $(srcdir)
+ CC=@CC@
+ 
+ DEFS=@DEFS@ -DDICTIONARY_BASE=\"$(DICTBASE)\"
+ CFLAGS=@CFLAGS@
+ LIBS=@LIBS@
+-CPPFLAGS=@CPPFLAGS@
++CPPFLAGS=@CPPFLAGS@ -I$(srcdir) -I.
+ LDFLAGS=@LDFLAGS@
+ 
+-.c.o:
+-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(DEFS) $<
++LIBTOOL = $(SHELL) ./libtool
++LT_VERSION_INFO = @LT_VERSION_INFO@
++EXEEXT = @EXEEXT@
++
++INSTALL = @INSTALL@
++INSTALL_DATA = $(INSTALL) -m 0644
++INSTALL_EXEC = $(INSTALL) -m 0755
++LN_S = @LN_S@
++
++%.o: $(srcdir)/%.c
++	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(DEFS) -o $@ $<
++
++# On Windows, this will automatically be set to hspell.exe
++HSPELL_EXECUTABLE=hspell$(EXEEXT)
+ 
+ # Our TARGETS variable chooses what to compile. Some things are
+ # optionally compiled depending on --enable-* paramters to configure.
+@@ -66,17 +80,15 @@
+ clean:
+ 	rm -f out.nouns out.verbs out.nouns-shemp hspell.pl_full \
+ 	      hspell.pl_wzip wunzip wordlist.wgz shemp.dat \
+-	      corlist.o dict_radix.o find_sizes.o gimatria.o \
+-	      hspell.o tclHash.o hebrew.wgz hebrew.wgz.sizes \
+-	      hebrew.wgz.prefixes dout.nouns.shemp.gz shemp.dat \
+-	      dout.nouns.wolig.gz dout.verbs.gz hspell find_sizes \
+-	      prefixes.c libhspell.o libhspell.a hspell.exe \
+-	      hebrew.wgz.desc hebrew.wgz.stems he_affix.dat \
+-	      he.wl mk_he_affix linginfo.o mk_he_affix.o \
+-	      hebrew.wgz.lingsizes.tmp dmask.c install.js \
++	      hebrew.wgz hebrew.wgz.sizes hebrew.wgz.prefixes \
++	      dout.nouns.shemp.gz shemp.dat dout.nouns.wolig.gz dout.verbs.gz \
++	      prefixes.c hebrew.wgz.desc hebrew.wgz.stems he_affix.dat \
++	      he.wl mk_he_affix hebrew.wgz.lingsizes.tmp dmask.c install.js \
+ 	      spell-he.xpi he.dic he.aff README-he.txt \
+ 	      README_he_IL.txt he_IL.dic he_IL.aff he_IL.zip \
+-	      specfilter.o specfilter
++	      find_sizes$(EXEEXT) specfilter$(EXEEXT)
++	rm -f *.o *.lo libhspell.la $(TARGET_EXECUTABLE) \
++	rm -fr .libs/
+ 	rm -f hebeng/install.js hebeng/heb-eng.aff hebeng/heb-eng.dic \
+ 	      hebeng/README-he.txt hebeng/README-en-US.txt \
+ 	      hebeng/spell-heb-eng.xpi
+@@ -85,43 +97,33 @@
+ distclean: clean
+ 	rm -f Makefile config.log config.status
+ 
+-# On Windows, this would typically be set to hspell.exe
+-HSPELL_EXECUTABLE=hspell
+-
+ install: all
+ 	test -d $(DESTDIR)$(BIN) || mkdir -m 755 -p $(DESTDIR)$(BIN)
+ 	strip $(HSPELL_EXECUTABLE)
+ 	-rm -f $(DESTDIR)$(BIN)/$(HSPELL_EXECUTABLE)
+-	cp $(HSPELL_EXECUTABLE) $(DESTDIR)$(BIN)/$(HSPELL_EXECUTABLE)
+-	chmod 755 $(DESTDIR)$(BIN)/$(HSPELL_EXECUTABLE)
+-	cp multispell $(DESTDIR)$(BIN)/multispell
+-	chmod 755 $(DESTDIR)$(BIN)/multispell
++	$(INSTALL_EXEC) $(HSPELL_EXECUTABLE) $(DESTDIR)$(BIN)/$(HSPELL_EXECUTABLE)
++	$(INSTALL_EXEC) $(srcdir)/multispell $(DESTDIR)$(BIN)/multispell
+ 	test -d $(DESTDIR)$(SHARE) || mkdir -m 755 -p $(DESTDIR)$(SHARE)
+-	cp hebrew.wgz hebrew.wgz.prefixes hebrew.wgz.sizes $(DESTDIR)$(SHARE)/
+-	gzip -9 < spellinghints > $(DESTDIR)$(SHARE)/hebrew.wgz.hints
+-	(cd $(DESTDIR)$(SHARE); chmod 644 hebrew.wgz hebrew.wgz.prefixes hebrew.wgz.sizes hebrew.wgz.hints)
+-	test ! -f hebrew.wgz.stems || cp hebrew.wgz.stems hebrew.wgz.desc $(DESTDIR)$(SHARE)/
+-	(cd $(DESTDIR)$(SHARE); test ! -f hebrew.wgz.stems || chmod 644 hebrew.wgz.stems hebrew.wgz.desc)
++	$(INSTALL_DATA) hebrew.wgz hebrew.wgz.prefixes hebrew.wgz.sizes $(DESTDIR)$(SHARE)/
++	gzip -9 < $(srcdir)/spellinghints > $(DESTDIR)$(SHARE)/hebrew.wgz.hints
++	test ! -f hebrew.wgz.stems || $(INSTALL_DATA) hebrew.wgz.stems hebrew.wgz.desc $(DESTDIR)$(SHARE)/
+ 	-rm -f $(DESTDIR)$(BIN)/hspell-i
+-	-ln -s $(HSPELL_EXECUTABLE) $(DESTDIR)$(BIN)/hspell-i
++	-$(LN_S) $(HSPELL_EXECUTABLE) $(DESTDIR)$(BIN)/hspell-i
+ 	test -d $(DESTDIR)$(MAN1) || mkdir -m 755 -p $(DESTDIR)$(MAN1)
+-	cp hspell.1 $(DESTDIR)$(MAN1)/
+-	chmod 644 $(DESTDIR)$(MAN1)/hspell.1
++	$(INSTALL_DATA) $(srcdir)/hspell.1 $(DESTDIR)$(MAN1)/
+ 	test -d $(DESTDIR)$(MAN3) || mkdir -m 755 -p $(DESTDIR)$(MAN3)
+-	cp hspell.3 $(DESTDIR)$(MAN3)/
+-	chmod 644 $(DESTDIR)$(MAN3)/hspell.3
++	$(INSTALL_DATA) $(srcdir)/hspell.3 $(DESTDIR)$(MAN3)/
+ 	test -d $(DESTDIR)$(LIBDIR) || mkdir -m 755 -p $(DESTDIR)$(LIBDIR)
+-	cp libhspell.a $(DESTDIR)$(LIBDIR)/
+-	chmod 644 $(DESTDIR)$(LIBDIR)/libhspell.a
++	$(LIBTOOL) --mode=install $(INSTALL) libhspell.la $(DESTDIR)$(LIBDIR)/
+ 	test -d $(DESTDIR)$(INCLUDEDIR) || mkdir -m 755 -p $(DESTDIR)$(INCLUDEDIR)
+-	cp hspell.h linginfo.h $(DESTDIR)$(INCLUDEDIR)/
+-	chmod 644 $(DESTDIR)$(INCLUDEDIR)/hspell.h $(DESTDIR)$(INCLUDEDIR)/linginfo.h
+-
++	$(INSTALL_DATA) $(srcdir)/hspell.h $(srcdir)/linginfo.h $(DESTDIR)$(INCLUDEDIR)/
++	test -d $(DESTDIR)$(LIBDIR)/pkgconfig || mkdir -m 755 -p $(DESTDIR)$(LIBDIR)/pkgconfig
++	$(INSTALL_DATA) hspell.pc $(DESTDIR)$(LIBDIR)/pkgconfig/
+ 
+ ################################################
+ # for creating an hspell distribution tar
+-PACKAGE = hspell
+-VERSION = 1.0
++PACKAGE = @PACKAGE_NAME@
++VERSION = @PACKAGE_VERSION@
+ DISTFILES = COPYING INSTALL LICENSE README WHATSNEW TODO \
+ 	Makefile.in stats wunzip.c wzip \
+ 	hspell.1 \
+@@ -133,9 +135,9 @@
+ 	hspell.h libhspell.c gzbuffered.h \
+ 	pmerge PrefixBits.pl genprefixes.pl \
+ 	hash.h tclHash.c tclHash.h \
+-        binarize-desc.pl pack-desc.pl linginfo.c linginfo.h \
++	binarize-desc.pl pack-desc.pl linginfo.c linginfo.h \
+ 	multispell hspell.3 mk_he_affix.c configure.in configure \
+-	install.js.pre specfilter.c
++	install.js.pre specfilter.c hspell.pc.in install-sh
+ 
+ DISTDIR = $(PACKAGE)-$(VERSION)
+ 
+@@ -161,33 +163,32 @@
+ 
+ ############################################################################
+ 
+-libhspell.a: dict_radix.o gimatria.o corlist.o libhspell.o $(EXTRAOBJECTS)
++%.lo: $(srcdir)/%.c
++	$(LIBTOOL) --tag=CC --mode=compile $(CC) -c $(CFLAGS) $(CPPFLAGS) $(DEFS) -o $@ $<
++
++libhspell.la: dict_radix.lo gimatria.lo corlist.lo libhspell.lo $(EXTRAOBJECTS)
+ 	-rm -f $@
+-	ar cr $@ $^
+-	-ranlib $@
++	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) $(LDFLAGS) -rpath $(LIBDIR) $(LT_VERSION_INFO) -no-undefined -o $@ $^ $(LIBS)
+ 
+-$(HSPELL_EXECUTABLE): hspell.o tclHash.o libhspell.a
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $(HSPELL_EXECUTABLE) hspell.o tclHash.o libhspell.a $(LIBS)
++$(HSPELL_EXECUTABLE): hspell.o tclHash.o libhspell.la
++	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) $(LDFLAGS) -o $(HSPELL_EXECUTABLE) hspell.o tclHash.o libhspell.la $(LIBS)
+ 
+ # remember to update this dependency list once in a while...
+-libhspell.o dict_radix.o find_sizes.o: dict_radix.h
+-dict_radix.o linginfo.o: gzbuffered.h
+-libhspell.o mk_he_affix.o: prefixes.c
+-hspell.o: hash.h tclHash.h
+-tclHash.o: tclHash.h
+-corlist.o gimatria.o hspell.o libhspell.o: hspell.h
+-hspell.o libhspell.o linginfo.o: linginfo.h hspell.h
+-linginfo.o: dmask.c
++libhspell.lo: prefixes.c
++linginfo.lo: prefixes.c dmask.c
++mk_he_affix.o: prefixes.c
+ specfilter.o: prefixes.c
+ 
+-prefixes.c: genprefixes.pl PrefixBits.pl
+-	$(PERL) -w ./genprefixes.pl >prefixes.c
++prefixes.c:
++	$(PERL) -w $(srcdir)/genprefixes.pl >prefixes.c
+ 
+-find_sizes: find_sizes.o dict_radix.o
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o find_sizes find_sizes.o dict_radix.o $(LIBS)
++# This workaround is necessary because dict_radix.c is also used by libhspell
++find_sizes$(EXEEXT): find_sizes.o
++	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(DEFS) -o find_sizes-dict_radix.o $(srcdir)/dict_radix.c
++	$(CC) $(CFLAGS) $(LDFLAGS) -o find_sizes$(EXEEXT) find_sizes.o find_sizes-dict_radix.o $(LIBS)
+ 
+ GZDICTS= dout.nouns.wolig.gz dout.verbs.gz dout.nouns.shemp.gz
+-DICTS=milot extrawords biza-verbs biza-nouns
++DICTS=$(srcdir)/milot $(srcdir)/extrawords $(srcdir)/biza-verbs $(srcdir)/biza-nouns
+ 
+ 
+ # hebrew.wgz contains all the words without any prefix hints like B,L,+ we
+@@ -195,12 +196,12 @@
+ # hebrew.wgz.prefixes is the prefix hints (one byte per word, compressed).
+ # hebrew.wgz.sizes contains the memory sizes that reading hebrew.wgz will
+ #   require (this makes it easier for hspell to preallocate the needed sizes).
+-hebrew.wgz hebrew.wgz.prefixes: pmerge PrefixBits.pl $(DICTS) $(GZDICTS)
+-	(gzip -dc $(GZDICTS); cat $(DICTS)) | ./pmerge -p hebrew.wgz.tmp | ./wzip | gzip -9 > hebrew.wgz
++hebrew.wgz hebrew.wgz.prefixes: $(DICTS) $(GZDICTS)
++	(gzip -dc $(GZDICTS); cat $(DICTS)) | $(PERL) -- $(srcdir)/pmerge -p hebrew.wgz.tmp | $(srcdir)/wzip | gzip -9 > hebrew.wgz
+ 	-rm -f hebrew.wgz.prefixes
+ 	gzip -9 < hebrew.wgz.tmp >hebrew.wgz.prefixes
+ 	-rm -f hebrew.wgz.tmp
+-hebrew.wgz.sizes: hebrew.wgz find_sizes
++hebrew.wgz.sizes: hebrew.wgz find_sizes$(EXEEXT)
+ 	gzip -dc hebrew.wgz | ./find_sizes >hebrew.wgz.sizes
+ 
+ ###################################### optional linginfo stuff ##############
+@@ -240,13 +241,13 @@
+ # target in front of the default targets.
+ 
+ linginfo_data: hebrew.wgz.stems
+-hebrew.wgz.desc hebrew.wgz.stems hebrew.wgz.lingsizes.tmp dmask.c: binarize-desc.pl PrefixBits.pl pack-desc.pl $(DICTS) $(GZDICTS) find_sizes
+-#hebrew.wgz hebrew.wgz.prefixes hebrew.wgz.desc hebrew.wgz.stems hebrew.wgz.lingsizes.tmp dmask.c: binarize-desc.pl pack-desc.pl $(DICTS) $(GZDICTS)
+-	(gzip -dc $(GZDICTS); cat $(DICTS)) | $(PERL) binarize-desc.pl | \
+-		sort -u | $(PERL) pack-desc.pl -p hebrew.wgz.prefixes.tmp \
++hebrew.wgz.desc hebrew.wgz.stems hebrew.wgz.lingsizes.tmp dmask.c: $(DICTS) $(GZDICTS) find_sizes$(EXEEXT)
++#hebrew.wgz hebrew.wgz.prefixes hebrew.wgz.desc hebrew.wgz.stems hebrew.wgz.lingsizes.tmp dmask.c: $(DICTS) $(GZDICTS)
++	(gzip -dc $(GZDICTS); cat $(DICTS)) | $(PERL) $(srcdir)/binarize-desc.pl | \
++		sort -u | $(PERL) $(srcdir)/pack-desc.pl -p hebrew.wgz.prefixes.tmp \
+ 		-d hebrew.wgz.desc.tmp -s hebrew.wgz.stems.tmp \
+ 		-l hebrew.wgz.lingsizes.tmp | \
+-		./wzip | gzip -9 > hebrew.wgz
++		$(srcdir)/wzip | gzip -9 > hebrew.wgz
+ 	gzip -dc hebrew.wgz | ./find_sizes >hebrew.wgz.sizes
+ 	cat hebrew.wgz.lingsizes.tmp >> hebrew.wgz.sizes
+ 	-rm -f hebrew.wgz.lingsizes.tmp
+@@ -268,17 +269,17 @@
+ # The dout files are quite large, as much as 10MB. To lower the amount
+ # of temporary space needed during compilation (is this necessary nowadays?)
+ # we compress them.
+-dout.nouns.%:  %.dat wolig.pl
+-	$(PERL) -w wolig.pl -d $< > $@
+-dout.nouns.%.gz:  %.dat wolig.pl
+-	$(PERL) -w wolig.pl -d $< | gzip -4 > $@
+-dout.nouns.shemp.gz:  shemp.dat wolig.pl
+-	$(PERL) -w wolig.pl -d shemp.dat | gzip -4 > $@
++dout.nouns.%:  $(srcdir)/%.dat
++	$(PERL) -w $(srcdir)/wolig.pl -d $< > $@
++dout.nouns.%.gz:  $(srcdir)/%.dat
++	$(PERL) -w $(srcdir)/wolig.pl -d $< | gzip -4 > $@
++dout.nouns.shemp.gz:  shemp.dat
++	$(PERL) -w $(srcdir)/wolig.pl -d shemp.dat | gzip -4 > $@
+ 
+ # We need two rules here, and not just two targets for one rule, to make
+ # parallel make work correctly. See bug 78 in the bugzilla for more info.
+-dout.verbs.gz: woo woo.dat
+-	$(PERL) -w woo -d woo.dat | sed "$(SEDCMD)" | gzip -4 > $@
++dout.verbs.gz:
++	$(PERL) -w $(srcdir)/woo -d $(srcdir)/woo.dat | sed "$(SEDCMD)" | gzip -4 > $@
+ shemp.dat: dout.verbs.gz
+ 
+ ############################################################################
+@@ -290,7 +291,7 @@
+ # The "aspell" target generates the "he_affix.dat" and "he.wl" files needed
+ # for using aspell 0.6 with Hspell's Hebrew word list.
+ aspell: he_affix.dat he.wl
+-mk_he_affix.o: prefixes.c hspell.h
++mk_he_affix.o: prefixes.c
+ he_affix.dat he.wl: mk_he_affix wunzip hebrew.wgz hebrew.wgz.prefixes specfilter
+ 	./mk_he_affix > he.wl
+ 
+@@ -310,12 +311,12 @@
+ # file containing the dictionaries in Myspell format (similar to the
+ # uncompressed aspell dictionary format).
+ mozilla: spell-he.xpi
+-spell-he.xpi: he.dic he.aff install.js README
++spell-he.xpi: he.dic he.aff install.js $(srcdir)/README
+ 	rm -f README-he.txt spell-he.xpi
+-	cp README README-he.txt
++	cp $(srcdir)/README README-he.txt
+ 	zip spell-he.xpi install.js README-he.txt he.aff he.dic
+-install.js: install.js.pre
+-	sed "s/%VERSION%/$(VERSION)/g; s/%DISPLAY_NAME%/Hebrew (IL) dictionary/g; s/%APP_NAME%/spell-he/g" < install.js.pre > install.js
++install.js:
++	sed "s/%VERSION%/$(VERSION)/g; s/%DISPLAY_NAME%/Hebrew (IL) dictionary/g; s/%APP_NAME%/spell-he/g" < $(srcdir)/install.js.pre > install.js
+ 
+ # The "heb-eng-xpi" target generates, like the "mozilla" target, an xpi
+ # file. But instead of taking only the Hebrew word list, it merges our
+@@ -341,7 +342,7 @@
+ heb-eng-xpi: hebeng hebeng/heb-eng.dic hebeng/heb-eng.aff hebeng/install.js README README-en-US.txt
+ 	(cd hebeng;\
+ 	rm -f README-he.txt spell-heb-eng.xpi ;\
+-	cp ../README README-he.txt;\
++	cp $(srcdir)/README README-he.txt;\
+ 	cp ../README-en-US.txt . ;\
+ 	zip spell-heb-eng.xpi install.js README-he.txt README-en-US.txt heb-eng.aff heb-eng.dic)
+ 
+@@ -360,9 +361,9 @@
+ 	zip he_IL.zip he_IL.dic he_IL.aff README_he_IL.txt
+ # note: zip dereferences symbolic links, so those are enough.
+ he_IL.dic: he.dic
+-	ln -s he.dic he_IL.dic
++	$(LN_S) he.dic he_IL.dic
+ he_IL.aff: he.aff
+-	ln -s he.aff he_IL.aff
++	$(LN_S) he.aff he_IL.aff
+ README_he_IL.txt:
+ 	echo "This Hebrew dictionary in Myspell format was generated automatically from" >README_he_IL.txt
+ 	echo "data prepared by the Hspell project:" >>README_he_IL.txt
+diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x '*.temp' -x texinfo.tex -x ylwrap -x configure -x gnome-doc-utils.make -x intltool.m4 -x omf.make -x xmldocs.make origsrc/hspell-1.0/configure.in src/hspell-1.0/configure.in
+--- origsrc/hspell-1.0/configure.in	2004-12-06 15:01:49.000000000 -0600
++++ src/hspell-1.0/configure.in	2006-06-21 23:31:57.824000000 -0500
+@@ -1,8 +1,11 @@
+ dnl Process this file with autoconf to produce Hspell's configure script.
+ 
++AC_INIT(hspell, 1.0, 
++	[http://www.ivrix.org.il/bugzilla/enter_bug.cgi?product=Hspell])
++
+ dnl "wolig.dat" is any file in the source directory, used to check we're in
+ dnl the right directory.
+-AC_INIT(wolig.dat)
++AC_CONFIG_SRCDIR(wolig.dat)
+ 
+ dnl this alows us to use $(MAKE) in the makefile, even if our make program
+ dnl doesn't support this variable. This requires putting @SET_MAKE@ in the
+@@ -10,7 +13,26 @@
+ AC_PROG_MAKE_SET
+ 
+ AC_PROG_CC
+-dnl AC_PROG_INSTALL
++AC_PROG_INSTALL
++AC_PROG_LIBTOOL
++
++dnl Libtool versioning (CURRENT:REVISION:AGE)
++dnl 1. Start with version information of 0:0:0 for each libtool library.
++dnl 2. Update the version information only immediately before a public
++dnl    release of your software. More frequent updates are unnecessary, and
++dnl    only guarantee that the current interface number gets larger faster.
++dnl 3. If the library source code has changed at all since the last
++dnl    update, then increment revision (c:r:a becomes c:r+1:a).
++dnl 4. If any interfaces have been added, removed, or changed since the
++dnl    last update, increment current, and set revision to 0.
++dnl 5. If any interfaces have been added since the last public release,
++dnl    then increment age.
++dnl 6. If any interfaces have been removed since the last public release,
++dnl    then set age to 0. 
++dnl
++dnl http://www.gnu.org/software/libtool/manual.html#Updating-version-info
++LT_VERSION_INFO="-version-info 1:0:0"
++AC_SUBST(LT_VERSION_INFO)
+ 
+ dnl Hspell uses the "inline" keyword, always as "static inline". Some old C
+ dnl compilers (such as the one on Solaris 8!) still don't have inline, so we
+@@ -25,9 +47,10 @@
+ 
+ dnl Check for libraries.
+ AC_CHECK_LIB([z],[gzread],
+- [AC_CHECK_HEADER([zlib.h],[AC_DEFINE(HAVE_ZLIB) LIBS="-lz $LIBS"],
++ [AC_CHECK_HEADER([zlib.h],[AC_DEFINE(HAVE_ZLIB) LIBS="-lz $LIBS" ZLIB_DEPS="-lz"],
+     [AC_MSG_RESULT([No Zlib header, defaulting to using pipes])])],
+  [AC_MSG_RESULT([No Zlib library, defaulting to using pipes])])
++AC_SUBST(ZLIB_DEPS)
+ 
+ dnl Allow the builder to enable or disable certain features of Hspell,
+ dnl and/or build or not build certain things.
+@@ -39,7 +62,7 @@
+ 
+ dnl Our TARGETS variable chooses what to compile. Some things are
+ dnl optionally compiled depending on --enable-* paramters to configure.
+-TARGETS="hebrew.wgz.sizes hspell"
++TARGETS="hebrew.wgz.sizes \$(HSPELL_EXECUTABLE)"
+ AC_SUBST(TARGETS)
+ 
+ dnl "fatverb" optional feature: (--enable-fatverb)
+@@ -100,7 +123,7 @@
+ then
+ 	AC_MSG_NOTICE([Feature linginfo enabled (morphological analyzer).])
+ 	AC_DEFINE(USE_LINGINFO)
+-	EXTRAOBJECTS="linginfo.o"
++	EXTRAOBJECTS="linginfo.lo"
+ # note that linginfo_data should be done first, because it currently builds
+ # some of the normal things (like hebrew.wgz) in a different way (using
+ # pack-desc, not pmerge). This is ugly, and should be fixed.
+@@ -132,4 +155,5 @@
+ AC_SUBST(DICTBASE)
+ 
+ 
+-AC_OUTPUT(Makefile)
++AC_CONFIG_FILES([Makefile hspell.pc])
++AC_OUTPUT
+diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x '*.temp' -x texinfo.tex -x ylwrap -x configure -x gnome-doc-utils.make -x intltool.m4 -x omf.make -x xmldocs.make origsrc/hspell-1.0/hspell.pc.in src/hspell-1.0/hspell.pc.in
+--- origsrc/hspell-1.0/hspell.pc.in	1969-12-31 18:00:00.000000000 -0600
++++ src/hspell-1.0/hspell.pc.in	2006-06-21 23:32:25.058375000 -0500
+@@ -0,0 +1,10 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++libdir=@libdir@
++includedir=@includedir@
++
++Name: Hspell
++Description: Hebrew spell-checker library
++Version: @PACKAGE_VERSION@
++Cflags: -I${includedir}
++Libs: -L${libdir} -lhspell @ZLIB_DEPS@
+diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x '*.temp' -x texinfo.tex -x ylwrap -x configure -x gnome-doc-utils.make -x intltool.m4 -x omf.make -x xmldocs.make origsrc/hspell-1.0/mk_he_affix.c src/hspell-1.0/mk_he_affix.c
+--- origsrc/hspell-1.0/mk_he_affix.c	2006-05-08 14:33:28.000000000 -0500
++++ src/hspell-1.0/mk_he_affix.c	2006-06-21 23:02:41.411000000 -0500
+@@ -13,7 +13,7 @@
+ #include "hspell.h"
+ 
+ /* #define PREFIXFILE_COMMAND "gzip -dc hebrew.wgz.prefixes" */
+-#define PREFIXFILE_COMMAND "gzip -dc hebrew.wgz.prefixes | specfilter"
++#define PREFIXFILE_COMMAND "gzip -dc hebrew.wgz.prefixes | ./specfilter"
+ 
+ /* Convert a number in the range 0..52 (currently) to a readable character
+    that can be used as the rule (prefix set) name. To facilitate merging our

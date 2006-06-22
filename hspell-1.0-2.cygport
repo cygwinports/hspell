@@ -1,0 +1,5 @@
+DESCRIPTION="Hebrew spell checking library"
+HOMEPAGE="http://ivrix.org.il/projects/spell-checker/"
+SRC_URI="http://ivrix.org.il/projects/spell-checker/${P}.tar.gz"
+
+CYGCONF_ARGS="--enable-fatverb --enable-linginfo"
