@@ -9,15 +9,15 @@ in more sophisticated research or applications that require Hebrew word
 lists or a Hebrew morphology engine. 
 
 Runtime requirements:
-  cygwin-1.5.20-1
+  cygwin-1.5.21-1
   perl-5.8.7-5
   zlib-1.2.3-1
 
 Build requirements:
-  cygwin-1.5.20-1
+  cygwin-1.5.21-1
   autoconf2.5-2.59-2
-  binutils-20050610-1
-  cygport-0.2.2-1
+  binutils-20060709-1
+  cygport-0.2.5-1
   gcc-core-3.4.4-1
   libtool1.5-1.5.22-1
   make-3.80-1
@@ -40,21 +40,17 @@ Build instructions:
 This will create:
   /usr/src/hspell-1.0-X-src.tar.bz2
   /usr/src/hspell-1.0-X.tar.bz2
+  /usr/src/libhspell-devel-1.0-X.tar.bz2
+  /usr/src/libhspell1-1.0-X.tar.bz2
 
 -------------------------------------------
 
-Files included in the binary package:
+Files included in the binary packages:
 
-  /usr/bin/cyghspell-1.dll
+(hspell)
   /usr/bin/hspell-i
   /usr/bin/hspell.exe
   /usr/bin/multispell
-  /usr/include/hspell.h
-  /usr/include/linginfo.h
-  /usr/lib/libhspell.a
-  /usr/lib/libhspell.dll.a
-  /usr/lib/libhspell.la
-  /usr/lib/pkgconfig/hspell.pc
   /usr/share/doc/Cygwin/hspell-1.0.README
   /usr/share/doc/hspell-1.0/COPYING
   /usr/share/doc/hspell-1.0/INSTALL
@@ -62,13 +58,24 @@ Files included in the binary package:
   /usr/share/doc/hspell-1.0/README
   /usr/share/doc/hspell-1.0/TODO
   /usr/share/doc/hspell-1.0/WHATSNEW
+  /usr/share/man/man1/hspell.1.gz
+
+(libhspell1)
+  /usr/bin/cyghspell-1.dll
   /usr/share/hspell/hebrew.wgz
   /usr/share/hspell/hebrew.wgz.desc
   /usr/share/hspell/hebrew.wgz.hints
   /usr/share/hspell/hebrew.wgz.prefixes
   /usr/share/hspell/hebrew.wgz.sizes
   /usr/share/hspell/hebrew.wgz.stems
-  /usr/share/man/man1/hspell.1.gz
+
+(libhspell-devel)
+  /usr/include/hspell.h
+  /usr/include/linginfo.h
+  /usr/lib/libhspell.a
+  /usr/lib/libhspell.dll.a
+  /usr/lib/libhspell.la
+  /usr/lib/pkgconfig/hspell.pc
   /usr/share/man/man3/hspell.3.gz
 
 ------------------

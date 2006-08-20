@@ -3,3 +3,9 @@ HOMEPAGE="http://ivrix.org.il/projects/spell-checker/"
 SRC_URI="http://ivrix.org.il/projects/spell-checker/${P}.tar.gz"
 
 CYGCONF_ARGS="--enable-fatverb --enable-linginfo"
+
+PKG_NAMES="${PN} lib${PN}1 lib${PN}-devel"
+PKG_HINTS="setup lib devel"
+PKG_CONTENTS[0]='--exclude=*.dll usr/bin/ usr/share/doc/ usr/share/man/man1/'
+PKG_CONTENTS[1]="usr/bin/*.dll usr/share/${PN}/"
+PKG_CONTENTS[2]='usr/include/ usr/lib/ usr/share/man/man3/'
