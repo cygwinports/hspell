@@ -1,4 +1,3 @@
-diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x Makefile.in.in -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x '*.temp' -x texinfo.tex -x ylwrap -x Makefile.in -x makefile.in -x configure -x gnome-doc-utils.make -x intltool.m4 -x omf.make -x xmldocs.make origsrc/hspell-1.0/Makefile.am src/hspell-1.0/Makefile.am
 --- origsrc/hspell-1.0/Makefile.am	1969-12-31 18:00:00.000000000 -0600
 +++ src/hspell-1.0/Makefile.am	2006-08-20 17:56:13.722500000 -0500
 @@ -0,0 +1,244 @@
@@ -246,7 +245,6 @@ diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depco
 +	echo "This dictionary is Copyright (C) 2000-2006, Nadav Har'El and Dan Kenigsberg." >>README_he_IL.txt
 +	echo "It is licensed under the GNU General Public License (GPL)." >>README_he_IL.txt
 +
-diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x Makefile.in.in -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x '*.temp' -x texinfo.tex -x ylwrap -x Makefile.in -x makefile.in -x configure -x gnome-doc-utils.make -x intltool.m4 -x omf.make -x xmldocs.make origsrc/hspell-1.0/configure.in src/hspell-1.0/configure.in
 --- origsrc/hspell-1.0/configure.in	2004-12-06 15:01:49.000000000 -0600
 +++ src/hspell-1.0/configure.in	2006-08-07 18:53:08.861000000 -0500
 @@ -1,16 +1,33 @@
@@ -379,7 +377,6 @@ diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depco
 -AC_OUTPUT(Makefile)
 +AC_CONFIG_FILES([Makefile hspell.pc])
 +AC_OUTPUT
-diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x Makefile.in.in -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x '*.temp' -x texinfo.tex -x ylwrap -x Makefile.in -x makefile.in -x configure -x gnome-doc-utils.make -x intltool.m4 -x omf.make -x xmldocs.make origsrc/hspell-1.0/hspell.pc.in src/hspell-1.0/hspell.pc.in
 --- origsrc/hspell-1.0/hspell.pc.in	1969-12-31 18:00:00.000000000 -0600
 +++ src/hspell-1.0/hspell.pc.in	2006-08-07 14:08:46.856875000 -0500
 @@ -0,0 +1,10 @@
@@ -393,7 +390,6 @@ diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depco
 +Version: @PACKAGE_VERSION@
 +Cflags: -I${includedir}
 +Libs: -L${libdir} -lhspell @ZLIB_LIBS@
-diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4*' -x ltmain.sh -x 'config.*' -x depcomp -x install-sh -x missing -x mkinstalldirs -x autom4te.cache -x '*compile' -x Makefile.in.in -x 'intltool*.in' -x 'xml-i18n-*.in' -x '*.pyc' -x '*.mo' -x '*.gmo' -x ABOUT-NLS -x Makevars.template -x COPYING -x INSTALL -x '*.orig' -x '*.rej' -x '*~' -x '*.temp' -x texinfo.tex -x ylwrap -x Makefile.in -x makefile.in -x configure -x gnome-doc-utils.make -x intltool.m4 -x omf.make -x xmldocs.make origsrc/hspell-1.0/mk_he_affix.c src/hspell-1.0/mk_he_affix.c
 --- origsrc/hspell-1.0/mk_he_affix.c	2006-05-08 14:33:28.000000000 -0500
 +++ src/hspell-1.0/mk_he_affix.c	2006-08-01 16:48:05.732875000 -0500
 @@ -13,7 +13,7 @@
