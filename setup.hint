@@ -1,5 +1,5 @@
 category: Text
-requires: cygwin perl libhspell1
+requires: perl libhspell1
 sdesc: "Hebrew spell-checker (apps)"
 ldesc: "The Hspell project is a free Hebrew linguistic project.
 Its primary goal is to create a free Hebrew spell-checker.

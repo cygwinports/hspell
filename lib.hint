@@ -1,5 +1,5 @@
 category: Text Libs
-requires: cygwin zlib
+requires: zlib
 external-source: hspell
 sdesc: "Hebrew spell-checker (runtime)"
 ldesc: "The Hspell project is a free Hebrew linguistic project.
