@@ -1,0 +1,29 @@
+DESCRIPTION="Hebrew spell checking library"
+HOMEPAGE="http://hspell.sourceforge.net/"
+SRC_URI="http://hspell.sourceforge.net/${P}.tar.gz"
+PATCH_URI="1.0-mk_he_affix.patch
+           1.0-shared-libhspell.patch"
+
+PKG_NAMES="${PN} lib${PN}1 lib${PN}-devel"
+hspell_CONTENTS='--exclude=*.dll usr/bin/ usr/share/doc/ usr/share/man/man1/'
+libhspell1_CONTENTS="usr/bin/cyghspell-1.dll usr/share/${PN}/"
+libhspell_devel_CONTENTS='usr/include/ usr/lib/ usr/share/man/man3/'
+
+CYGCONF_ARGS="--enable-fatverb --enable-linginfo"
+MAKEOPTS+=" -j1"
+
+src_compile() {
+	cd ${S}
+	cygautoreconf
+	lndirs
+	cd ${B}
+	cygconf
+	cygmake all cyghspell-0.dll
+}
+
+src_install() {
+	cd ${B}
+	cyginstall
+	dobin cyghspell-0.dll
+	dolib libhspell.dll.a
+}
