@@ -1,8 +1,7 @@
 DESCRIPTION="Hebrew spell checking library"
 HOMEPAGE="http://hspell.sourceforge.net/"
 SRC_URI="http://hspell.sourceforge.net/${P}.tar.gz"
-PATCH_URI="1.0-mk_he_affix.patch
-           1.0-shared-libhspell.patch"
+PATCH_URI="1.0-shared-libhspell.patch"
 
 PKG_NAMES="${PN} lib${PN}1 lib${PN}-devel"
 hspell_CONTENTS='--exclude=*.dll usr/bin/ usr/share/doc/ usr/share/man/man1/'
