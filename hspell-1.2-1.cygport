@@ -1,15 +1,15 @@
 DESCRIPTION="Hebrew spell checking library"
 HOMEPAGE="http://hspell.sourceforge.net/"
 SRC_URI="http://hspell.sourceforge.net/${P}.tar.gz"
-PATCH_URI="1.0-shared-libhspell.patch"
+PATCH_URI="1.2-cygwin-shared.patch"
 
-PKG_NAMES="${PN} lib${PN}1 lib${PN}-devel"
+PKG_NAMES="${PN} ${PN}-dict lib${PN}0 lib${PN}-devel"
 hspell_CONTENTS='--exclude=*.dll usr/bin/ usr/share/doc/ usr/share/man/man1/'
-libhspell1_CONTENTS="usr/bin/cyghspell-1.dll usr/share/${PN}/"
+hspell_dict_CONTENTS="usr/share/${PN}/"
+libhspell0_CONTENTS="usr/bin/cyghspell-0.dll"
 libhspell_devel_CONTENTS='usr/include/ usr/lib/ usr/share/man/man3/'
 
-CYGCONF_ARGS="--enable-fatverb --enable-linginfo"
-MAKEOPTS+=" -j1"
+CYGCONF_ARGS="--enable-fatverb --enable-linginfo --enable-shared"
 
 src_compile() {
 	cd ${S}
@@ -17,12 +17,10 @@ src_compile() {
 	lndirs
 	cd ${B}
 	cygconf
-	cygmake all cyghspell-0.dll
+	cygmake -j1 all
 }
 
 src_install() {
 	cd ${B}
 	cyginstall
-	dobin cyghspell-0.dll
-	dolib libhspell.dll.a
 }

@@ -1,0 +1,44 @@
+--- origsrc/hspell-1.2/configure.in	2012-02-25 15:35:46.000000000 -0600
++++ src/hspell-1.2/configure.in	2012-03-04 22:39:19.799614800 -0600
+@@ -112,7 +112,10 @@ AC_ARG_ENABLE([shared],
+ if test x$ac_opt_shared = xyes
+ then
+ 	AC_MSG_NOTICE([Shared library building enabled.])
+-	HSPELL_LIB="libhspell.so.0"
++	case `uname -s` in
++		CYGWIN*)  HSPELL_LIB="cyghspell-0.dll" ;;
++		*)        HSPELL_LIB="libhspell.so.0" ;;
++	esac
+ else
+ 	AC_MSG_NOTICE([Shared library building disabled.])
+ 	HSPELL_LIB="libhspell.a"
+--- origsrc/hspell-1.2/Makefile.in	2012-02-26 16:04:55.000000000 -0600
++++ src/hspell-1.2/Makefile.in	2012-03-04 23:38:44.127849200 -0600
+@@ -137,9 +137,14 @@ install: all
+ 	test -d $(DESTDIR)$(INCLUDEDIR) || mkdir -m 755 -p $(DESTDIR)$(INCLUDEDIR)
+ 	cp hspell.h linginfo.h $(DESTDIR)$(INCLUDEDIR)/
+ 	chmod 644 $(DESTDIR)$(INCLUDEDIR)/hspell.h $(DESTDIR)$(INCLUDEDIR)/linginfo.h
+-	test -f libhspell.so.0 && cp libhspell.so.0 $(DESTDIR)$(LIBDIR)/
+-	test -f libhspell.so.0 && chmod 755 $(DESTDIR)$(LIBDIR)/libhspell.so.0
+-	test -f libhspell.so.0 && ln -sf libhspell.so.0 $(DESTDIR)$(LIBDIR)/libhspell.so
++	if test -f cyghspell-0.dll; then \
++		cp cyghspell-0.dll $(DESTDIR)$(BIN)/ ; \
++		cp libhspell.dll.a $(DESTDIR)$(LIBDIR)/ ; \
++	elif test -f libhspell.so.0; then \
++		cp libhspell.so.0 $(DESTDIR)$(LIBDIR)/ ; \
++		chmod 755 $(DESTDIR)$(LIBDIR)/libhspell.so.0 ; \
++		ln -sf libhspell.so.0 $(DESTDIR)$(LIBDIR)/libhspell.so ; \
++	fi
+ 
+ 
+ ################################################
+@@ -198,6 +203,9 @@ libhspell.so.0: $(LIBOBJS:.o=.lo)
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -shared -Wl,-soname,libhspell.so.0 $^ -lz
+ 	ln -sf libhspell.so.0 libhspell.so
+ 
++cyghspell-0.dll: $(LIBOBJS:.o=.lo)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -shared -Wl,--out-implib,libhspell.dll.a $^ -lz
++
+ HSPELL_LIB = @HSPELL_LIB@
+ $(HSPELL_EXECUTABLE): hspell.o tclHash.o $(HSPELL_LIB)
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $(HSPELL_EXECUTABLE) hspell.o tclHash.o $(HSPELL_LIB) $(LIBS)
