@@ -1,5 +1,5 @@
 NAME="hspell"
-VERSION=1.2
+VERSION=1.3
 RELEASE=1
 CATEGORY="Text"
 SUMMARY="Hebrew spell-checker"
@@ -8,18 +8,20 @@ primary goal is to create a free Hebrew spell-checker. The secondary goal
 is to make the algorithms and dictionaries, created initially for the spell-
 checker, freely available. These could be used in more sophisticated research
 or applications that require Hebrew word lists or a Hebrew morphology engine."
-HOMEPAGE="http://hspell.sourceforge.net/"
-SRC_URI="http://hspell.sourceforge.net/${NAME}-${VERSION}.tar.gz"
+HOMEPAGE="http://hspell.ivrix.org.il/"
+SRC_URI="http://hspell.ivrix.org.il/hspell-${VERSION}.tar.gz"
 PATCH_URI="1.2-cygwin-shared.patch"
 
-PKG_NAMES="${NAME} ${NAME}-dict lib${NAME}0 lib${NAME}-devel"
-hspell_CONTENTS='--exclude=*.dll usr/bin/ usr/share/doc/ usr/share/man/man1/'
-hspell_dict_CONTENTS="usr/share/${NAME}/"
+PKG_NAMES="${NAME} ${NAME}-common lib${NAME}0 lib${NAME}-devel hunspell-he"
+hspell_CONTENTS='--exclude=*.dll usr/bin/ usr/share/man/man1/'
+hspell_common_CONTENTS="usr/share/doc/ usr/share/${NAME}/"
 libhspell0_CATEGORY="Libs"
-libhspell0_REQUIRES="hspell-dict"
+libhspell0_REQUIRES="hspell-common"
 libhspell0_CONTENTS="usr/bin/cyghspell-0.dll"
 libhspell_devel_CATEGORY="Libs"
 libhspell_devel_CONTENTS='usr/include/ usr/lib/ usr/share/man/man3/'
+hunspell_he_SUMMARY="Hebrew dictionary for Hunspell"
+hunspell_he_CONTENTS="usr/share/myspell/he*"
 
 CYGCONF_ARGS="--enable-fatverb --enable-linginfo --enable-shared"
 
@@ -30,9 +32,15 @@ src_compile() {
 	cd ${B}
 	cygconf
 	cygmake -j1 all
+	cygmake -j1 hunspell
 }
 
 src_install() {
 	cd ${B}
-	cyginstall
+	cyginstall STRIP=:
+	rm -f ${D}/usr/lib/libhspell.a
+
+	insinto /usr/share/myspell
+	newins he.dic he_IL.dic
+	newins he.aff he_IL.aff
 }
